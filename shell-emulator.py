@@ -80,9 +80,18 @@ class ShellEmulator:
         with open(self.log_file, 'w') as log_f:
             json.dump(self.log, log_f)
 
+    def run_start_script(self):
+        try:
+            with open(self.start_script, 'r') as script:
+                for line in script:
+                    self.execute_command(line.strip())
+        except:
+            print('Start script was not found')
+
     def run(self):
+        self.run_start_script()
         while True:
-            command = input(f"{self.hostname}:{self.current_dir}$ ")
+            command = input(f"{self.hostname}:{self.current_dir if self.current_dir == '/' else self.current_dir[:-1]}$ ")
             self.execute_command(command)
 
 if __name__ == "__main__":
