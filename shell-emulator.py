@@ -1,6 +1,6 @@
 import tarfile
 import configparser
-import time
+from datetime import datetime
 
 class ShellEmulator:
     def __init__(self, config_path):
@@ -11,7 +11,7 @@ class ShellEmulator:
         self.start_script = self.config['start_script']
         self.current_dir = "/"
         self.log = []
-        self.start_time = time.time()
+        self.start_time = datetime.now()
 
     def load_config(self, config_path):
         config = configparser.ConfigParser()
@@ -36,6 +36,8 @@ class ShellEmulator:
             self.exit_shell()
         elif command.startswith("find"):
             self.find_file(command.split(" ")[1])
+        elif command == "uptime":
+            self.show_uptime()
         else:
             print(f"{command}: command not found")
 
@@ -56,6 +58,11 @@ class ShellEmulator:
     def find_file(self, filename):
         found_files = [name[len(self.current_dir):] for name in self.virtual_files if name.startswith(self.current_dir) and (name.find(filename) >= len(self.current_dir))]
         print("\n".join(found_files) if len(found_files) != 0 else f"find: '{filename}': No such file or directory")
+
+    def show_uptime(self):
+        now = datetime.now()
+        uptime = now - self.start_time
+        print(f"{now.strftime('%H:%M:%S')} up {round(uptime.total_seconds() / 60)} min,  1 user")
 
     def exit_shell(self):
         print("Exiting shell...")
