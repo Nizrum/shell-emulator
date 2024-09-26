@@ -27,9 +27,39 @@ class ShellEmulator:
         tar = tarfile.open(tar_path, "r")
         return {member.name[13:]: member for member in tar.getmembers()}
 
+    def execute_command(self, command):
+        if command.startswith("cd"):
+            self.change_directory(command.split(" ")[1])
+        elif command == "ls":
+            self.list_directory()
+        elif command == "exit":
+            self.exit_shell()
+        else:
+            print(f"{command}: command not found")
+
+    def change_directory(self, path):
+        if path == "/":
+            self.current_dir = "/"
+        elif path == "..":
+            self.current_dir = '/'.join(self.current_dir.split('/')[:-2]) + '/'
+        elif (self.current_dir + path) in self.virtual_files:
+            self.current_dir = self.current_dir + path + "/"
+        else:
+            print(f"cd: {path}: No such file or directory")
+
+    def list_directory(self):
+        dir_content = filter(lambda name: len(name.split('/')) == 1, [name[len(self.current_dir):] for name in self.virtual_files if name.startswith(self.current_dir)])
+        print("\n".join(dir_content))
+
+    def exit_shell(self):
+        print("Exiting shell...")
+        exit()
+
+    def run(self):
+        while True:
+            command = input(f"{self.hostname}:{self.current_dir}$ ")
+            self.execute_command(command)
+
 if __name__ == "__main__":
     emulator = ShellEmulator("config.ini")
-    print(emulator.hostname)
-    print(emulator.virtual_files)
-    print(emulator.log_file)
-    print(emulator.start_script)
+    emulator.run()
