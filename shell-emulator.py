@@ -34,6 +34,8 @@ class ShellEmulator:
             self.list_directory()
         elif command == "exit":
             self.exit_shell()
+        elif command.startswith("find"):
+            self.find_file(command.split(" ")[1])
         else:
             print(f"{command}: command not found")
 
@@ -50,6 +52,10 @@ class ShellEmulator:
     def list_directory(self):
         dir_content = filter(lambda name: len(name.split('/')) == 1, [name[len(self.current_dir):] for name in self.virtual_files if name.startswith(self.current_dir)])
         print("\n".join(dir_content))
+
+    def find_file(self, filename):
+        found_files = [name[len(self.current_dir):] for name in self.virtual_files if name.startswith(self.current_dir) and (name.find(filename) >= len(self.current_dir))]
+        print("\n".join(found_files) if len(found_files) != 0 else f"find: '{filename}': No such file or directory")
 
     def exit_shell(self):
         print("Exiting shell...")
