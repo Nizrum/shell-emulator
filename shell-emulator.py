@@ -1,6 +1,7 @@
 import tarfile
 import configparser
 from datetime import datetime
+import json
 
 class ShellEmulator:
     def __init__(self, config_path):
@@ -50,23 +51,34 @@ class ShellEmulator:
             self.current_dir = self.current_dir + path + "/"
         else:
             print(f"cd: {path}: No such file or directory")
+        self.log_action('cd', self.current_dir)
 
     def list_directory(self):
-        dir_content = filter(lambda name: len(name.split('/')) == 1, [name[len(self.current_dir):] for name in self.virtual_files if name.startswith(self.current_dir)])
+        dir_content = list(filter(lambda name: len(name.split('/')) == 1, [name[len(self.current_dir):] for name in self.virtual_files if name.startswith(self.current_dir)]))
         print("\n".join(dir_content))
+        self.log_action('ls', dir_content)
 
     def find_file(self, filename):
         found_files = [name[len(self.current_dir):] for name in self.virtual_files if name.startswith(self.current_dir) and (name.find(filename) >= len(self.current_dir))]
         print("\n".join(found_files) if len(found_files) != 0 else f"find: '{filename}': No such file or directory")
+        self.log_action('find', filename)
 
     def show_uptime(self):
         now = datetime.now()
         uptime = now - self.start_time
-        print(f"{now.strftime('%H:%M:%S')} up {round(uptime.total_seconds() / 60)} min,  1 user")
+        result = f"{now.strftime('%H:%M:%S')} up {round(uptime.total_seconds() / 60)} min,  1 user"
+        print(result)
+        self.log_action('uptime', result)
 
     def exit_shell(self):
+        self.log_action('exit', 'Shell exited')
         print("Exiting shell...")
         exit()
+
+    def log_action(self, action, result):
+        self.log.append({'action': action, 'result': result})
+        with open(self.log_file, 'w') as log_f:
+            json.dump(self.log, log_f)
 
     def run(self):
         while True:
