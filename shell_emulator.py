@@ -25,8 +25,8 @@ class ShellEmulator:
         }
 
     def load_tar(self, tar_path):
-        tar = tarfile.open(tar_path, "r")
-        return {member.name[13:]: member for member in tar.getmembers()}
+        with tarfile.open(tar_path, "r") as tar:
+          return {member.name[13:]: member for member in tar.getmembers()}
 
     def execute_command(self, command):
         if command.startswith("cd"):
@@ -51,17 +51,19 @@ class ShellEmulator:
             self.current_dir = self.current_dir + path + "/"
         else:
             print(f"cd: {path}: No such file or directory")
-        self.log_action('cd', self.current_dir)
+        self.log_action(f'cd {path}', self.current_dir)
 
     def list_directory(self):
         dir_content = list(filter(lambda name: len(name.split('/')) == 1, [name[len(self.current_dir):] for name in self.virtual_files if name.startswith(self.current_dir)]))
         print("\n".join(dir_content))
         self.log_action('ls', dir_content)
+        return dir_content
 
     def find_file(self, filename):
         found_files = [name[len(self.current_dir):] for name in self.virtual_files if name.startswith(self.current_dir) and (name.find(filename) >= len(self.current_dir))]
         print("\n".join(found_files) if len(found_files) != 0 else f"find: '{filename}': No such file or directory")
-        self.log_action('find', filename)
+        self.log_action(f'find {filename}', found_files)
+        return found_files
 
     def show_uptime(self):
         now = datetime.now()
@@ -69,6 +71,7 @@ class ShellEmulator:
         result = f"{now.strftime('%H:%M:%S')} up {round(uptime.total_seconds() / 60)} min,  1 user"
         print(result)
         self.log_action('uptime', result)
+        return result
 
     def exit_shell(self):
         self.log_action('exit', 'Shell exited')
