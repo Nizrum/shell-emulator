@@ -58,7 +58,9 @@
 
 ## Примеры использования
 
-![Видео примера использования эмулятора](./readme-media/shell_emulator_video.mp4)
+https://github.com/user-attachments/assets/e583116d-d2a5-48da-b95a-7bf8212607fd
+
+
 
 ## Результаты прогона тестов
 
