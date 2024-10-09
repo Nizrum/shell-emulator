@@ -31,8 +31,13 @@ class ShellEmulator:
     def execute_command(self, command):
         if command.startswith("cd"):
             self.change_directory(command.split(" ")[1])
-        elif command == "ls":
-            self.list_directory()
+        elif command.startswith("ls"):
+            temp_dir = self.current_dir
+            if len(command.split(" ")) == 1:
+                self.list_directory("")
+            else:
+                self.list_directory(command.split(" ")[1])
+            self.current_dir = temp_dir
         elif command == "exit":
             self.exit_shell()
         elif command.startswith("find"):
@@ -53,7 +58,13 @@ class ShellEmulator:
             print(f"cd: {path}: No such file or directory")
         self.log_action(f'cd {path}', self.current_dir)
 
-    def list_directory(self):
+    def list_directory(self, path):
+        if path != "" and path != "/" and path != ".." and not ((self.current_dir + path) in self.virtual_files):
+            print(f"ls: {path}: No such file or directory")
+            self.log_action('ls', f"ls: {path}: No such file or directory")
+            return []
+        if path != "":
+            self.change_directory(path)
         dir_content = list(filter(lambda name: len(name.split('/')) == 1, [name[len(self.current_dir):] for name in self.virtual_files if name.startswith(self.current_dir)]))
         print("\n".join(dir_content))
         self.log_action('ls', dir_content)
