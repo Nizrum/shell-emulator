@@ -22,7 +22,7 @@ class TestShellEmulator(unittest.TestCase):
         self.assertEqual(self.emulator.current_dir, '/')
 
     def test_ls(self):
-        result = self.emulator.list_directory('')
+        result = self.emulator.list_directory()
         self.assertEqual(['example1.txt', 'example2.txt', 'example-folder-1'], result)
 
         result = self.emulator.list_directory('example-folder-1')

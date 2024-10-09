@@ -34,7 +34,7 @@ class ShellEmulator:
         elif command.startswith("ls"):
             temp_dir = self.current_dir
             if len(command.split(" ")) == 1:
-                self.list_directory("")
+                self.list_directory()
             else:
                 self.list_directory(command.split(" ")[1])
             self.current_dir = temp_dir
@@ -58,7 +58,7 @@ class ShellEmulator:
             print(f"cd: {path}: No such file or directory")
         self.log_action(f'cd {path}', self.current_dir)
 
-    def list_directory(self, path):
+    def list_directory(self, path=""):
         if path != "" and path != "/" and path != ".." and not ((self.current_dir + path) in self.virtual_files):
             print(f"ls: {path}: No such file or directory")
             self.log_action('ls', f"ls: {path}: No such file or directory")
